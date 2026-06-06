@@ -4,8 +4,8 @@ package com.example.e_inkfitness.core.model
 data class BikeMetrics(
     val speed : Float,
     val distance: Float,
-    val rollingSpeed: Float,
+    val totalTime: Float,
+    val rollingTime: Float,
+    val avgRollingSpeed: Float,
     val calories: Float,
-    val time: Float,
-    val rollingTime: Float
 )
