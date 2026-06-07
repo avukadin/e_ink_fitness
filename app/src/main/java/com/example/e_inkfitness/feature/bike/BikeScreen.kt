@@ -1,6 +1,7 @@
 package com.example.e_inkfitness.feature.bike
 
 
+import android.location.Location
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,13 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,11 +37,21 @@ import com.mudita.mmd.components.snackbar.SnackbarHostMMD
 import com.mudita.mmd.components.snackbar.SnackbarHostStateMMD
 import java.util.Locale
 
+
+interface ButtonClickCallbacks {
+    fun onPause()
+    fun onStop()
+    fun onResume()
+}
+
+
+
+
 @Composable
 fun BikeScreen(
     uiState: BikeUiState,
+    buttonClickCallbacks: ButtonClickCallbacks
 ) {
-
 
     val speed = UnitConversion.convertSpeed(
         uiState.metrics.speed,
@@ -93,13 +112,12 @@ fun BikeScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(8.dp)
-                    .padding(bottom = 56.dp)
+                    .padding(bottom = 25.dp)
             ) {
                 Row(
                     modifier = Modifier.weight(1f)
@@ -156,15 +174,24 @@ fun BikeScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp)
                 )
+                Row(modifier = Modifier.weight(1f)
+                ) {
+                    MetricBox(
+                        value = elapsedTime,
+                        sub1 = "Time",
+                        modifier = Modifier.weight(1f),
+                        valueFontSize = 52.sp
+                    )
+                }
 
-                MetricBox(
-                    value = elapsedTime,
-                    sub1 = "Time",
-                    modifier = Modifier.weight(1f),
-                    valueFontSize = 52.sp
-                )
+                Row( modifier = Modifier.weight(0.5f),
+                    ) {
+                    Controls(activityState = uiState.activityState,buttonClickCallbacks= buttonClickCallbacks)
+                }
+
             }
         }
+
     }
 
 }
@@ -190,11 +217,65 @@ private fun MetricBox(
                 text = value,
                 fontSize = valueFontSize
             )
-
             Text(
                 text = sub1,
                 fontSize = 18.sp
             )
+        }
+    }
+}
+
+
+@Composable
+private fun Controls(
+    modifier: Modifier = Modifier,
+    iconSize: Dp = 82.dp,
+    activityState : ActivityState,
+    buttonClickCallbacks: ButtonClickCallbacks
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(6.dp).padding(bottom = 12.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            if (activityState == ActivityState.PAUSED || activityState == ActivityState.STOPPED){
+            IconButton(
+                onClick = { buttonClickCallbacks.onResume()}
+            ) {
+
+                Icon(
+                    imageVector = Icons.Filled.PlayArrow,
+                    contentDescription = "Start",
+                    modifier = Modifier.size(iconSize)
+                )
+            }
+                }else if (activityState == ActivityState.ACTIVE){
+                    IconButton(
+                        onClick = { buttonClickCallbacks.onPause() }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Pause,
+                            contentDescription = "Pause",
+                            modifier = Modifier.size(iconSize)
+                        )
+                    }
+            }
+
+
+            IconButton(
+                onClick = { buttonClickCallbacks.onStop() }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Stop,
+                    contentDescription = "Stop",
+                    modifier = Modifier.size(iconSize)
+                )
+            }
+
         }
     }
 }

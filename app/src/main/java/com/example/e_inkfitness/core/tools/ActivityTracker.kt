@@ -4,7 +4,7 @@ import android.location.Location
 import com.example.e_inkfitness.core.model.BikeMetrics
 import com.example.e_inkfitness.core.sensor.GpsState
 
-class ActivityTracker {
+class ActivityTracker(weightKg: Float) {
 
     var bikeMetrics = BikeMetrics(
         speed = 0f,
@@ -17,6 +17,7 @@ class ActivityTracker {
         private set
 
     private var lastLocation: Location? = null
+    private val calorieTracker: CalorieTracker = CalorieTracker(weightKg)
 
     fun recordBikeActivity(location: Location, gpsState: GpsState) {
         val prevLocation = lastLocation
@@ -39,11 +40,27 @@ class ActivityTracker {
                 totalTime = elapsedTime + bikeMetrics.totalTime,
                 rollingTime = elapsedTime + bikeMetrics.rollingTime,
                 avgRollingSpeed = distance / (elapsedTime + bikeMetrics.rollingTime),
-                calories = 0f,
+                calories = calorieTracker.cyclingCalories(elapsedTime, location.speed),
             )
         }
 
         lastLocation = location
+    }
+
+    fun clearLastLocation(){
+        lastLocation = null
+    }
+
+    fun reset(){
+        bikeMetrics = BikeMetrics(
+            speed = 0f,
+            distance = 0f,
+            totalTime = 0f,
+            rollingTime = 0f,
+            avgRollingSpeed = 0f,
+            calories = 0f,
+        )
+        calorieTracker.reset()
     }
 
     companion object {

@@ -13,7 +13,7 @@ import com.example.e_inkfitness.core.tools.ActivityTracker
 
 class BikeViewModel : ViewModel() {
 
-    private val activityTracker = ActivityTracker()
+    private val activityTracker = ActivityTracker(95f)
 
     var uiState by mutableStateOf(
         BikeUiState(
@@ -27,7 +27,7 @@ class BikeViewModel : ViewModel() {
             ),
             user = User(Units.METRIC, 95),
             gpsState = GpsState.WAITING,
-            isTracking = false
+            activityState = ActivityState.ACTIVE
         )
 
     )
@@ -45,6 +45,39 @@ class BikeViewModel : ViewModel() {
     fun onGpsStateChange(gpsState: GpsState) {
         uiState = uiState.copy(
             gpsState = gpsState
+        )
+        if (uiState.gpsState == GpsState.DISABLED){
+            activityTracker.clearLastLocation()
+        }
+    }
+
+    fun onPauseClicked(){
+        uiState = uiState.copy(
+            activityState = ActivityState.PAUSED
+        )
+        onGpsStateChange(GpsState.STOPPED)
+        activityTracker.clearLastLocation()
+    }
+
+    fun onStopClicked(){
+        uiState = uiState.copy(
+            activityState = ActivityState.STOPPED,
+            metrics = BikeMetrics(
+                speed = 0f,
+                distance = 0f,
+                totalTime = 0f,
+                rollingTime = 0f,
+                avgRollingSpeed = 0f,
+                calories = 0f,
+            ),
+        )
+        activityTracker.clearLastLocation()
+        activityTracker.reset()
+    }
+
+    fun onResumeClicked(){
+        uiState = uiState.copy(
+            activityState = ActivityState.ACTIVE
         )
     }
 }

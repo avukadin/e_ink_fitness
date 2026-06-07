@@ -13,7 +13,7 @@ interface LocationCallback {
 }
 
 enum class GpsState {
-    DENIED, DISABLED, WAITING, ACTIVE, LOW_ACCURACY
+    DENIED, DISABLED, WAITING, ACTIVE, LOW_ACCURACY, STOPPED
 }
 
 class GpsLocationProvider(
@@ -43,6 +43,7 @@ class GpsLocationProvider(
     fun stop() {
         locationManager.removeUpdates(this)
         goodFixCount = 0
+        gpsState = GpsState.STOPPED
     }
 
     private fun startGps() {

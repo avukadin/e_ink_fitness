@@ -14,6 +14,7 @@ import com.example.e_inkfitness.core.sensor.GpsState
 import com.example.e_inkfitness.core.sensor.LocationCallback
 import com.example.e_inkfitness.feature.bike.BikeScreen
 import com.example.e_inkfitness.feature.bike.BikeViewModel
+import com.example.e_inkfitness.feature.bike.ButtonClickCallbacks
 import com.mudita.mmd.ThemeMMD
 
 class MainActivity : ComponentActivity() {
@@ -45,7 +46,18 @@ class MainActivity : ComponentActivity() {
         setContent {
             ThemeMMD {
                 BikeScreen(
-                    bikeViewModel.uiState
+                    bikeViewModel.uiState,
+                    object : ButtonClickCallbacks {
+                        override fun onPause() {
+                            onPauseClicked()
+                        }
+                        override fun onResume() {
+                            onResumeClicked()
+                        }
+                        override fun onStop() {
+                            onStopClicked()
+                        }
+                    }
                 )
             }
         }
@@ -84,5 +96,20 @@ class MainActivity : ComponentActivity() {
             locationProvider.stop()
         }
     }
+
+    fun onPauseClicked(){
+        bikeViewModel.onPauseClicked()
+        locationProvider.stop()
+    }
+
+    fun onResumeClicked(){
+        bikeViewModel.onResumeClicked()
+        locationProvider.start()
+    }
+    fun onStopClicked(){
+        bikeViewModel.onStopClicked()
+        locationProvider.stop()
+    }
 }
+
 
