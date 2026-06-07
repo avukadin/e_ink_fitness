@@ -56,10 +56,10 @@ class BikeViewModel : ViewModel() {
     }
 
     fun onPauseClicked() {
-        val metrics = uiState.metrics.copy(speed=0f)
+        val metrics = uiState.metrics.copy(speed = 0f)
         uiState = uiState.copy(
-            activityState = ActivityState.PAUSED ,
-            metrics=metrics
+            activityState = ActivityState.PAUSED,
+            metrics = metrics
         )
         onGpsStateChange(GpsState.STOPPED)
         activityTracker.clearLastLocation()
@@ -83,7 +83,8 @@ class BikeViewModel : ViewModel() {
 
     fun onResumeClicked() {
         uiState = uiState.copy(
-            activityState = ActivityState.ACTIVE
+            activityState = ActivityState.ACTIVE,
+            gpsState = GpsState.WAITING
         )
     }
 }

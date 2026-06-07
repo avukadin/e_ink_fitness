@@ -3,7 +3,6 @@ package com.example.e_inkfitness.core.tools
 import android.location.Location
 import com.example.e_inkfitness.core.model.BikeMetrics
 import com.example.e_inkfitness.core.sensor.GpsState
-import com.example.e_inkfitness.feature.bike.ActivityState
 
 class ActivityTracker(weightKg: Float) {
 

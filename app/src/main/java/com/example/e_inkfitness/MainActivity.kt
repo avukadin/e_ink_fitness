@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,7 +27,7 @@ class MainActivity : ComponentActivity() {
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (!granted) {
                 bikeViewModel.onGpsStateChange(GpsState.DENIED)
-            }else{
+            } else {
                 locationProvider.start()
                 bikeViewModel.onGpsStateChange(locationProvider.gpsState)
             }
@@ -34,6 +35,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        window.addFlags(
+            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+        )
 
         locationProvider = GpsLocationProvider(this, object : LocationCallback {
             override fun onLocation(location: Location, gpsState: GpsState) {
@@ -49,9 +54,11 @@ class MainActivity : ComponentActivity() {
                         override fun onPause() {
                             onPauseClicked()
                         }
+
                         override fun onResume() {
                             onResumeClicked()
                         }
+
                         override fun onStop() {
                             onStopClicked()
                         }
@@ -108,6 +115,11 @@ class MainActivity : ComponentActivity() {
     fun onStopClicked() {
         bikeViewModel.onStopClicked()
         locationProvider.stop()
+    }
+
+    override fun onStop() {
+        bikeViewModel.onPauseClicked()
+        super.onStop()
     }
 }
 

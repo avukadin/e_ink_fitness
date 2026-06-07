@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
@@ -102,15 +103,9 @@ fun BikeScreen(
                 )
 
             }
+
             else -> {}
         }
-    }
-
-    val snackbarOpen = when (uiState.gpsState) {
-        GpsState.DENIED,
-        GpsState.WAITING,
-        GpsState.LOW_ACCURACY -> true
-        else -> false
     }
 
     Scaffold(
@@ -130,7 +125,7 @@ fun BikeScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(8.dp)
-                    .padding(bottom = 25.dp)
+                    .padding(bottom = 35.dp)
             ) {
                 Row(
                     modifier = Modifier.weight(1f)
@@ -199,12 +194,11 @@ fun BikeScreen(
                 }
 
                 Row(
-                    modifier = Modifier.weight(0.5f),
+                    modifier = Modifier.weight(0.7f),
                 ) {
                     Controls(
                         activityState = uiState.activityState,
                         buttonClickCallbacks = buttonClickCallbacks,
-                        snackbarOpen = snackbarOpen
                     )
                 }
 
@@ -248,57 +242,86 @@ private fun MetricBox(
 @Composable
 private fun Controls(
     modifier: Modifier = Modifier,
-    iconSize: Dp = 82.dp,
+    iconSize: Dp = 74.dp,
     activityState: ActivityState,
     buttonClickCallbacks: ButtonClickCallbacks,
-    snackbarOpen: Boolean,
 ) {
-    if (snackbarOpen) return
     Box(
         modifier = modifier
             .fillMaxSize()
             .padding(6.dp)
-            .padding(bottom = 12.dp),
+            .padding(bottom = 22.dp),
         contentAlignment = Alignment.Center
     ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(24.dp)
-            ) {
-                if (activityState == ActivityState.PAUSED || activityState == ActivityState.STOPPED) {
-                    IconButton(
-                        onClick = { buttonClickCallbacks.onResume() }
-                    ) {
-
-                        Icon(
-                            imageVector = Icons.Filled.PlayArrow,
-                            contentDescription = "Start",
-                            modifier = Modifier.size(iconSize),
-                        )
-                    }
-                } else if (activityState == ActivityState.ACTIVE) {
-                    IconButton(
-                        onClick = { buttonClickCallbacks.onPause() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Pause,
-                            contentDescription = "Pause",
-                            modifier = Modifier.size(iconSize)
-                        )
-                    }
-                }
-
-
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            if (activityState == ActivityState.PAUSED || activityState == ActivityState.STOPPED) {
                 IconButton(
-                    onClick = { buttonClickCallbacks.onStop() }
+                    onClick = {
+                        buttonClickCallbacks.onResume()
+                    },
+                    modifier = Modifier
+                        .size(iconSize)
+                        .fillMaxSize(),
                 ) {
+
                     Icon(
-                        imageVector = Icons.Filled.Stop,
-                        contentDescription = "Stop",
-                        modifier = Modifier.size(iconSize)
+                        imageVector = Icons.Default.PlayArrow,
+                        contentDescription = "Start",
+                        modifier = Modifier
+                            .size(iconSize)
+                            .fillMaxSize(),
                     )
                 }
-
+            } else if (activityState == ActivityState.ACTIVE) {
+                IconButton(
+                    onClick = { buttonClickCallbacks.onPause() },
+                    modifier = Modifier
+                        .size(iconSize)
+                        .fillMaxSize(),
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Pause,
+                        contentDescription = "Pause",
+                        modifier = Modifier
+                            .size(iconSize)
+                            .fillMaxSize(),
+                    )
+                }
             }
+
+
+            IconButton(
+                onClick = { buttonClickCallbacks.onStop() },
+                modifier = Modifier
+                    .size(iconSize)
+                    .fillMaxSize(),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Stop,
+                    contentDescription = "Stop",
+                    modifier = Modifier
+                        .size(iconSize)
+                        .fillMaxSize(),
+                )
+            }
+
+            IconButton(
+                onClick = { buttonClickCallbacks.onStop() },
+                modifier = Modifier
+                    .size(iconSize)
+                    .fillMaxSize(),
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.List,
+                    contentDescription = "Settings",
+                    modifier = Modifier
+                        .size(iconSize)
+                        .fillMaxSize(),
+                )
+            }
+        }
     }
 }
 

@@ -18,7 +18,7 @@ class CalorieTracker(private val weightKg: Float) {
     }
 
     fun cyclingCalories(timeSeconds: Float, speedKm: Float): Float {
-        val burnedSince = cyclingMet(speedKm) * weightKg * (timeSeconds / (60*60f))
+        val burnedSince = cyclingMet(speedKm) * weightKg * (timeSeconds / (60 * 60f))
         totalCalories += burnedSince
         return totalCalories
     }
