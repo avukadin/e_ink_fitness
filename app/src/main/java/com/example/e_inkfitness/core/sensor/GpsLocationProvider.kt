@@ -23,7 +23,7 @@ class GpsLocationProvider(
     private val locationManager =
         context.getSystemService(Context.LOCATION_SERVICE)
                 as LocationManager
-    var gpsState = GpsState.WAITING
+    var gpsState = GpsState.STOPPED
 
     var goodFixCount = 0;
     fun start() {

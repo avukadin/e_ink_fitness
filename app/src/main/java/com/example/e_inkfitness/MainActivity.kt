@@ -24,14 +24,12 @@ class MainActivity : ComponentActivity() {
 
     private val permissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            var gpsState = GpsState.WAITING
-            if (granted) {
+            if (!granted) {
+                bikeViewModel.onGpsStateChange(GpsState.DENIED)
+            }else{
                 locationProvider.start()
-                gpsState = locationProvider.gpsState
-            } else {
-                gpsState = GpsState.DENIED
+                bikeViewModel.onGpsStateChange(locationProvider.gpsState)
             }
-            bikeViewModel.onGpsStateChange(gpsState)
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,7 +87,7 @@ class MainActivity : ComponentActivity() {
             ) == PackageManager.PERMISSION_GRANTED
 
         if (hasPermission) {
-            bikeViewModel.onGpsStateChange(GpsState.WAITING)
+            bikeViewModel.onGpsStateChange(GpsState.STOPPED)
             locationProvider.start()
         } else {
             bikeViewModel.onGpsStateChange(GpsState.DENIED)
@@ -97,16 +95,17 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun onPauseClicked(){
+    fun onPauseClicked() {
         bikeViewModel.onPauseClicked()
         locationProvider.stop()
     }
 
-    fun onResumeClicked(){
+    fun onResumeClicked() {
         bikeViewModel.onResumeClicked()
         locationProvider.start()
     }
-    fun onStopClicked(){
+
+    fun onStopClicked() {
         bikeViewModel.onStopClicked()
         locationProvider.stop()
     }

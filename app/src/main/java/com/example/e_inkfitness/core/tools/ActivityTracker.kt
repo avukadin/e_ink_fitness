@@ -3,6 +3,7 @@ package com.example.e_inkfitness.core.tools
 import android.location.Location
 import com.example.e_inkfitness.core.model.BikeMetrics
 import com.example.e_inkfitness.core.sensor.GpsState
+import com.example.e_inkfitness.feature.bike.ActivityState
 
 class ActivityTracker(weightKg: Float) {
 
@@ -19,7 +20,7 @@ class ActivityTracker(weightKg: Float) {
     private var lastLocation: Location? = null
     private val calorieTracker: CalorieTracker = CalorieTracker(weightKg)
 
-    fun recordBikeActivity(location: Location, gpsState: GpsState) {
+    fun recordBikeActivity(location: Location, gptState: GpsState) {
         val prevLocation = lastLocation
         var elapsedTime = 0f
         if (prevLocation != null) {
@@ -27,7 +28,7 @@ class ActivityTracker(weightKg: Float) {
         }
 
         // Only update the time
-        if (prevLocation == null || gpsState == GpsState.LOW_ACCURACY || !location.hasSpeed() || location.speed <= MIN_MOVING_SPEED) {
+        if (prevLocation == null || gptState == GpsState.LOW_ACCURACY || !location.hasSpeed() || location.speed <= MIN_MOVING_SPEED) {
             bikeMetrics = bikeMetrics.copy(
                 speed = 0f,
                 totalTime = elapsedTime + bikeMetrics.totalTime
@@ -47,11 +48,11 @@ class ActivityTracker(weightKg: Float) {
         lastLocation = location
     }
 
-    fun clearLastLocation(){
+    fun clearLastLocation() {
         lastLocation = null
     }
 
-    fun reset(){
+    fun reset() {
         bikeMetrics = BikeMetrics(
             speed = 0f,
             distance = 0f,

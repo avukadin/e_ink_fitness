@@ -13,7 +13,8 @@ import com.example.e_inkfitness.core.tools.ActivityTracker
 
 class BikeViewModel : ViewModel() {
 
-    private val activityTracker = ActivityTracker(95f)
+    private val defaultUser = User(Units.METRIC, 95.0f)
+    private val activityTracker = ActivityTracker(defaultUser.weightKG)
 
     var uiState by mutableStateOf(
         BikeUiState(
@@ -25,15 +26,18 @@ class BikeViewModel : ViewModel() {
                 avgRollingSpeed = 0f,
                 calories = 0f,
             ),
-            user = User(Units.METRIC, 95),
-            gpsState = GpsState.WAITING,
-            activityState = ActivityState.ACTIVE
+            user = defaultUser,
+            gpsState = GpsState.STOPPED,
+            activityState = ActivityState.STOPPED
         )
 
     )
         private set
 
     fun onLocation(location: Location, gpsState: GpsState) {
+        if (uiState.activityState != ActivityState.ACTIVE) {
+            return
+        }
         activityTracker.recordBikeActivity(location, gpsState)
 
         uiState = uiState.copy(
@@ -46,20 +50,22 @@ class BikeViewModel : ViewModel() {
         uiState = uiState.copy(
             gpsState = gpsState
         )
-        if (uiState.gpsState == GpsState.DISABLED){
+        if (uiState.gpsState == GpsState.DISABLED) {
             activityTracker.clearLastLocation()
         }
     }
 
-    fun onPauseClicked(){
+    fun onPauseClicked() {
+        val metrics = uiState.metrics.copy(speed=0f)
         uiState = uiState.copy(
-            activityState = ActivityState.PAUSED
+            activityState = ActivityState.PAUSED ,
+            metrics=metrics
         )
         onGpsStateChange(GpsState.STOPPED)
         activityTracker.clearLastLocation()
     }
 
-    fun onStopClicked(){
+    fun onStopClicked() {
         uiState = uiState.copy(
             activityState = ActivityState.STOPPED,
             metrics = BikeMetrics(
@@ -75,7 +81,7 @@ class BikeViewModel : ViewModel() {
         activityTracker.reset()
     }
 
-    fun onResumeClicked(){
+    fun onResumeClicked() {
         uiState = uiState.copy(
             activityState = ActivityState.ACTIVE
         )

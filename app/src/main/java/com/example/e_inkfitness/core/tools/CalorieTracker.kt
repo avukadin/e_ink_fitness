@@ -1,8 +1,7 @@
 package com.example.e_inkfitness.core.tools
 
 
-
-class CalorieTracker (private val weightKg: Float) {
+class CalorieTracker(private val weightKg: Float) {
 
     private var totalCalories = 0f
 
@@ -18,13 +17,13 @@ class CalorieTracker (private val weightKg: Float) {
         }
     }
 
-    fun cyclingCalories(timeSeconds:Float, speedKm:Float) : Float{
-        val burnedSince =  cyclingMet(speedKm)*weightKg*(timeSeconds/60f)
+    fun cyclingCalories(timeSeconds: Float, speedKm: Float): Float {
+        val burnedSince = cyclingMet(speedKm) * weightKg * (timeSeconds / (60*60f))
         totalCalories += burnedSince
         return totalCalories
     }
 
-    fun reset(){
+    fun reset() {
         totalCalories = 0f
     }
 }

@@ -6,5 +6,5 @@ enum class Units {
 
 data class User(
     val units: Units,
-    val weightKG: Int,
+    val weightKG: Float,
 )

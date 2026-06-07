@@ -1,7 +1,6 @@
 package com.example.e_inkfitness.feature.bike
 
 
-import android.location.Location
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +32,7 @@ import com.example.e_inkfitness.core.sensor.GpsState
 import com.example.e_inkfitness.core.tools.UnitConversion
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.mudita.mmd.components.divider.VerticalDividerMMD
+import com.mudita.mmd.components.snackbar.SnackbarDurationMMD
 import com.mudita.mmd.components.snackbar.SnackbarHostMMD
 import com.mudita.mmd.components.snackbar.SnackbarHostStateMMD
 import java.util.Locale
@@ -43,8 +43,6 @@ interface ButtonClickCallbacks {
     fun onStop()
     fun onResume()
 }
-
-
 
 
 @Composable
@@ -84,20 +82,35 @@ fun BikeScreen(
     LaunchedEffect(uiState.gpsState) {
         when (uiState.gpsState) {
             GpsState.DENIED -> {
-                snackbarHostState.showSnackbar("GPS Permission Denied")
+                snackbarHostState.showSnackbar(
+                    "GPS Permission Denied",
+                    duration = SnackbarDurationMMD.Indefinite
+                )
             }
 
             GpsState.WAITING -> {
-                snackbarHostState.showSnackbar("Waiting for GPS Signal")
+                snackbarHostState.showSnackbar(
+                    "Waiting for GPS Signal",
+                    duration = SnackbarDurationMMD.Indefinite
+                )
             }
 
             GpsState.LOW_ACCURACY -> {
-                snackbarHostState.showSnackbar("GPS Signal Unavailable")
-            }
+                snackbarHostState.showSnackbar(
+                    "GPS Signal Unavailable",
+                    duration = SnackbarDurationMMD.Indefinite
+                )
 
+            }
             else -> {}
         }
+    }
 
+    val snackbarOpen = when (uiState.gpsState) {
+        GpsState.DENIED,
+        GpsState.WAITING,
+        GpsState.LOW_ACCURACY -> true
+        else -> false
     }
 
     Scaffold(
@@ -174,7 +187,8 @@ fun BikeScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp)
                 )
-                Row(modifier = Modifier.weight(1f)
+                Row(
+                    modifier = Modifier.weight(1f)
                 ) {
                     MetricBox(
                         value = elapsedTime,
@@ -184,9 +198,14 @@ fun BikeScreen(
                     )
                 }
 
-                Row( modifier = Modifier.weight(0.5f),
-                    ) {
-                    Controls(activityState = uiState.activityState,buttonClickCallbacks= buttonClickCallbacks)
+                Row(
+                    modifier = Modifier.weight(0.5f),
+                ) {
+                    Controls(
+                        activityState = uiState.activityState,
+                        buttonClickCallbacks = buttonClickCallbacks,
+                        snackbarOpen = snackbarOpen
+                    )
                 }
 
             }
@@ -230,30 +249,33 @@ private fun MetricBox(
 private fun Controls(
     modifier: Modifier = Modifier,
     iconSize: Dp = 82.dp,
-    activityState : ActivityState,
-    buttonClickCallbacks: ButtonClickCallbacks
+    activityState: ActivityState,
+    buttonClickCallbacks: ButtonClickCallbacks,
+    snackbarOpen: Boolean,
 ) {
+    if (snackbarOpen) return
     Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(6.dp).padding(bottom = 12.dp),
+            .padding(6.dp)
+            .padding(bottom = 12.dp),
         contentAlignment = Alignment.Center
     ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            if (activityState == ActivityState.PAUSED || activityState == ActivityState.STOPPED){
-            IconButton(
-                onClick = { buttonClickCallbacks.onResume()}
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(24.dp)
             ) {
+                if (activityState == ActivityState.PAUSED || activityState == ActivityState.STOPPED) {
+                    IconButton(
+                        onClick = { buttonClickCallbacks.onResume() }
+                    ) {
 
-                Icon(
-                    imageVector = Icons.Filled.PlayArrow,
-                    contentDescription = "Start",
-                    modifier = Modifier.size(iconSize)
-                )
-            }
-                }else if (activityState == ActivityState.ACTIVE){
+                        Icon(
+                            imageVector = Icons.Filled.PlayArrow,
+                            contentDescription = "Start",
+                            modifier = Modifier.size(iconSize),
+                        )
+                    }
+                } else if (activityState == ActivityState.ACTIVE) {
                     IconButton(
                         onClick = { buttonClickCallbacks.onPause() }
                     ) {
@@ -263,20 +285,20 @@ private fun Controls(
                             modifier = Modifier.size(iconSize)
                         )
                     }
+                }
+
+
+                IconButton(
+                    onClick = { buttonClickCallbacks.onStop() }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Stop,
+                        contentDescription = "Stop",
+                        modifier = Modifier.size(iconSize)
+                    )
+                }
+
             }
-
-
-            IconButton(
-                onClick = { buttonClickCallbacks.onStop() }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Stop,
-                    contentDescription = "Stop",
-                    modifier = Modifier.size(iconSize)
-                )
-            }
-
-        }
     }
 }
 
