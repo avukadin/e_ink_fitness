@@ -1,6 +1,5 @@
 package com.example.e_inkfitness.feature.bike
 
-import BikeUiState
 import android.location.Location
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,9 +20,10 @@ class BikeViewModel : ViewModel() {
             metrics = BikeMetrics(
                 speed = 0f,
                 distance = 0f,
-                avgMovingSpeed = 0f,
+                totalTime = 0f,
+                rollingTime = 0f,
+                avgRollingSpeed = 0f,
                 calories = 0f,
-                elapsedTime = 0f
             ),
             user = User(Units.METRIC, 95),
             gpsState = GpsState.WAITING,
@@ -33,17 +33,18 @@ class BikeViewModel : ViewModel() {
     )
         private set
 
-    fun onLocation(location: Location) {
-        activityTracker.recordBikeActivity(location)
+    fun onLocation(location: Location, gpsState: GpsState) {
+        activityTracker.recordBikeActivity(location, gpsState)
 
         uiState = uiState.copy(
-                metrics= BikeMetrics(
-                    speed = activityTracker.currentSpeed,
-                    distance = activityTracker.totalDistance,
-                    avgMovingSpeed = activityTracker.avgMovingSpeed,
-                    elapsedTime = activityTracker.totalTime,
-                    calories = 0f,
-                    )
+            metrics = activityTracker.bikeMetrics,
+            gpsState = gpsState
+        )
+    }
+
+    fun onGpsStateChange(gpsState: GpsState) {
+        uiState = uiState.copy(
+            gpsState = gpsState
         )
     }
 }

@@ -2,7 +2,7 @@ package com.example.e_inkfitness.core.tools
 
 import com.example.e_inkfitness.core.model.Units
 
-object UnitConversion{
+object UnitConversion {
 
     fun convertDistance(meters: Float, units: Units): Float {
         return when (units) {
@@ -18,14 +18,14 @@ object UnitConversion{
         }
     }
 
-    fun convertSpeed(kmh: Float, units: Units): Float {
+    fun convertSpeed(speedMs: Float, units: Units): Float {
         return when (units) {
-            Units.METRIC -> kmh // km/h
-            Units.IMPERIAL -> kmh * 0.621371f // mp/h
+            Units.METRIC -> speedMs * 3.6f       // km/h
+            Units.IMPERIAL -> speedMs * 2.23694f // mph
         }
     }
 
-    fun toMS(kmh:Float):Float{
-        return (kmh*0.277778).toFloat() // m/s
+    fun toMS(kmh: Float): Float {
+        return (kmh * 0.277778).toFloat() // m/s
     }
 }

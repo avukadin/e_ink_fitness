@@ -2,10 +2,11 @@ package com.example.e_inkfitness.core.tools
 
 import android.location.Location
 import com.example.e_inkfitness.core.model.BikeMetrics
+import com.example.e_inkfitness.core.sensor.GpsState
 
 class ActivityTracker {
 
-    var  bikeMetrics = BikeMetrics(
+    var bikeMetrics = BikeMetrics(
         speed = 0f,
         distance = 0f,
         totalTime = 0f,
@@ -13,40 +14,40 @@ class ActivityTracker {
         avgRollingSpeed = 0f,
         calories = 0f,
     )
-    private set
+        private set
 
     private var lastLocation: Location? = null
 
-    fun recordBikeActivity(location: Location){
-        if (!location.hasSpeed()) return
-        if (location.hasAccuracy() && location.accuracy > 25f) return
-
-        val speed = location.speed
-
+    fun recordBikeActivity(location: Location, gpsState: GpsState) {
         val prevLocation = lastLocation
-        if (prevLocation != null ){
-            val lastTime = prevLocation.time
+        var elapsedTime = 0f
+        if (prevLocation != null) {
+            elapsedTime = (location.time - prevLocation.time) / 1000f
+        }
 
-            val elapsedTime = (location.time - lastTime) / 1000f
-            val distance = prevLocation.distanceTo(location)
-
-            var rollingTime = 0f
-            if (speed >= MIN_MOVING_SPEED){
-                rollingTime = (location.time - lastTime) / 1000f
-            }
+        // Only update the time
+        if (prevLocation == null || gpsState == GpsState.LOW_ACCURACY || !location.hasSpeed() || location.speed <= MIN_MOVING_SPEED) {
+            bikeMetrics = bikeMetrics.copy(
+                speed = 0f,
+                totalTime = elapsedTime + bikeMetrics.totalTime
+            )
+        } else {
+            val distance = prevLocation.distanceTo(location) + bikeMetrics.distance
             bikeMetrics = BikeMetrics(
-                speed=speed,
-                distance=distance,
+                speed = location.speed,
+                distance = distance,
                 totalTime = elapsedTime + bikeMetrics.totalTime,
-                rollingTime = rollingTime + bikeMetrics.rollingTime,
-                avgRollingSpeed = distance/(rollingTime + bikeMetrics.rollingTime),
+                rollingTime = elapsedTime + bikeMetrics.rollingTime,
+                avgRollingSpeed = distance / (elapsedTime + bikeMetrics.rollingTime),
                 calories = 0f,
             )
         }
+
         lastLocation = location
     }
 
     companion object {
-        private val MIN_MOVING_SPEED = UnitConversion.toMS(1.5f)
+        private val MIN_MOVING_SPEED =
+            UnitConversion.toMS(1.5f)
     }
 }

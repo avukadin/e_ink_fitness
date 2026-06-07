@@ -9,11 +9,11 @@ import android.location.LocationManager
 import androidx.core.content.ContextCompat
 
 interface LocationCallback {
-    fun onLocation(location: Location)
+    fun onLocation(location: Location, gpsState: GpsState)
 }
 
 enum class GpsState {
-    DENIED, DISABLED, WAITING, ACTIVE
+    DENIED, DISABLED, WAITING, ACTIVE, LOW_ACCURACY
 }
 
 class GpsLocationProvider(
@@ -24,6 +24,8 @@ class GpsLocationProvider(
         context.getSystemService(Context.LOCATION_SERVICE)
                 as LocationManager
     var gpsState = GpsState.WAITING
+
+    var goodFixCount = 0;
     fun start() {
         val hasPermission =
             ContextCompat.checkSelfPermission(
@@ -37,8 +39,10 @@ class GpsLocationProvider(
         }
         startGps()
     }
-    fun stop(){
+
+    fun stop() {
         locationManager.removeUpdates(this)
+        goodFixCount = 0
     }
 
     private fun startGps() {
@@ -66,7 +70,20 @@ class GpsLocationProvider(
     }
 
     override fun onLocationChanged(location: Location) {
-        callback.onLocation(location)
+        if (location.hasAccuracy() && location.accuracy >= MAX_ACCURACY) {
+            gpsState = GpsState.LOW_ACCURACY
+        } else {
+            goodFixCount += 1
+        }
+
+        if (goodFixCount > MIN_FIX_COUNT) {
+            callback.onLocation(location, gpsState)
+        }
+    }
+
+    companion object {
+        private const val MAX_ACCURACY = 15f
+        private const val MIN_FIX_COUNT = 5
     }
 
 }
