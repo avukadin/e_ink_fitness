@@ -1,5 +1,7 @@
 package com.example.e_inkfitness.core.tools
 
+import com.example.e_inkfitness.core.model.Units
+
 
 class CalorieTracker(private val weightKg: Float) {
 
@@ -17,8 +19,13 @@ class CalorieTracker(private val weightKg: Float) {
         }
     }
 
-    fun cyclingCalories(timeSeconds: Float, speedKm: Float): Float {
-        val burnedSince = cyclingMet(speedKm) * weightKg * (timeSeconds / (60 * 60f))
+    fun cyclingCalories(timeSeconds: Float, speedMs: Float): Float {
+        val speedKmh = UnitConversion.convertSpeed(
+            speedMs,
+            Units.METRIC
+        )
+
+        val burnedSince = cyclingMet(speedKmh) * weightKg * (timeSeconds / (60 * 60f))
         totalCalories += burnedSince
         return totalCalories
     }
