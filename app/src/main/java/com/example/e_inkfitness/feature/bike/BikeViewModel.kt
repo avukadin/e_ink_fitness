@@ -8,6 +8,8 @@ import androidx.lifecycle.ViewModel
 import com.example.e_inkfitness.core.model.BikeMetrics
 import com.example.e_inkfitness.core.model.Units
 import com.example.e_inkfitness.core.model.User
+import com.example.e_inkfitness.core.model.getNewBikeMetrics
+import com.example.e_inkfitness.core.sensor.AltitudeSample
 import com.example.e_inkfitness.core.sensor.GpsState
 import com.example.e_inkfitness.core.tools.ActivityTracker
 
@@ -18,14 +20,7 @@ class BikeViewModel : ViewModel() {
 
     var uiState by mutableStateOf(
         BikeUiState(
-            metrics = BikeMetrics(
-                speed = 0f,
-                distance = 0f,
-                totalTime = 0f,
-                rollingTime = 0f,
-                avgRollingSpeed = 0f,
-                calories = 0f,
-            ),
+            metrics = getNewBikeMetrics(),
             user = defaultUser,
             gpsState = GpsState.STOPPED,
             activityState = ActivityState.STOPPED
@@ -34,11 +29,11 @@ class BikeViewModel : ViewModel() {
     )
         private set
 
-    fun onLocation(location: Location, gpsState: GpsState) {
+    fun onLocation(location: Location, altitude: AltitudeSample?, gpsState: GpsState) {
         if (uiState.activityState != ActivityState.ACTIVE) {
             return
         }
-        activityTracker.recordBikeActivity(location, gpsState)
+        activityTracker.recordBikeActivity(location, altitude,gpsState)
 
         uiState = uiState.copy(
             metrics = activityTracker.bikeMetrics,
@@ -68,14 +63,7 @@ class BikeViewModel : ViewModel() {
     fun onStopClicked() {
         uiState = uiState.copy(
             activityState = ActivityState.STOPPED,
-            metrics = BikeMetrics(
-                speed = 0f,
-                distance = 0f,
-                totalTime = 0f,
-                rollingTime = 0f,
-                avgRollingSpeed = 0f,
-                calories = 0f,
-            ),
+            metrics = getNewBikeMetrics()
         )
         activityTracker.clearLastLocation()
         activityTracker.reset()

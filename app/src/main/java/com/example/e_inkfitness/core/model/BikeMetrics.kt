@@ -8,4 +8,17 @@ data class BikeMetrics(
     val rollingTime: Float,
     val avgRollingSpeed: Float,
     val calories: Float,
+    val elevationGain: Float,
 )
+
+fun getNewBikeMetrics() : BikeMetrics{
+    return BikeMetrics(
+        speed = 0f,
+        distance = 0f,
+        totalTime = 0f,
+        rollingTime = 0f,
+        avgRollingSpeed = 0f,
+        calories = 0f,
+        elevationGain = 0f
+    )
+}

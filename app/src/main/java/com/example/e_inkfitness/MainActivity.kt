@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import com.example.e_inkfitness.core.sensor.AltitudeProvider
 import com.example.e_inkfitness.core.sensor.GpsLocationProvider
 import com.example.e_inkfitness.core.sensor.GpsState
 import com.example.e_inkfitness.core.sensor.LocationCallback
@@ -21,6 +22,7 @@ import com.mudita.mmd.ThemeMMD
 class MainActivity : ComponentActivity() {
 
     private lateinit var locationProvider: GpsLocationProvider
+    private lateinit var altitudeProvider: AltitudeProvider
     private val bikeViewModel by viewModels<BikeViewModel>()
 
     private val permissionLauncher =
@@ -40,11 +42,15 @@ class MainActivity : ComponentActivity() {
             WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
         )
 
+        altitudeProvider = AltitudeProvider()
+
         locationProvider = GpsLocationProvider(this, object : LocationCallback {
             override fun onLocation(location: Location, gpsState: GpsState) {
-                bikeViewModel.onLocation(location, gpsState)
+                bikeViewModel.onLocation(location, altitudeProvider.altitudeSample, gpsState)
             }
         })
+
+
 
         setContent {
             ThemeMMD {

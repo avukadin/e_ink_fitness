@@ -1,7 +1,10 @@
 package com.example.e_inkfitness.core.tools
 
+import AltitudeTracker
 import android.location.Location
 import com.example.e_inkfitness.core.model.BikeMetrics
+import com.example.e_inkfitness.core.model.getNewBikeMetrics
+import com.example.e_inkfitness.core.sensor.AltitudeSample
 import com.example.e_inkfitness.core.sensor.GpsState
 
 class ActivityTracker(weightKg: Float) {
@@ -13,17 +16,22 @@ class ActivityTracker(weightKg: Float) {
         rollingTime = 0f,
         avgRollingSpeed = 0f,
         calories = 0f,
+        elevationGain = 0f,
     )
         private set
 
     private var lastLocation: Location? = null
     private val calorieTracker: CalorieTracker = CalorieTracker(weightKg)
+    private val altitudeTracker: AltitudeTracker = AltitudeTracker()
 
-    fun recordBikeActivity(location: Location, gptState: GpsState) {
+    fun recordBikeActivity(location: Location, altitudeSample: AltitudeSample?, gptState: GpsState) {
         val prevLocation = lastLocation
         var elapsedTime = 0f
         if (prevLocation != null) {
             elapsedTime = (location.time - prevLocation.time) / 1000f
+        }
+        if (altitudeSample != null){
+            altitudeTracker.updateAltitude(altitudeSample.altitudeMeters)
         }
 
         // Only update the time
@@ -33,6 +41,7 @@ class ActivityTracker(weightKg: Float) {
                 totalTime = elapsedTime + bikeMetrics.totalTime
             )
         } else {
+
             val distance = prevLocation.distanceTo(location) + bikeMetrics.distance
             bikeMetrics = BikeMetrics(
                 speed = location.speed,
@@ -41,6 +50,7 @@ class ActivityTracker(weightKg: Float) {
                 rollingTime = elapsedTime + bikeMetrics.rollingTime,
                 avgRollingSpeed = distance / (elapsedTime + bikeMetrics.rollingTime),
                 calories = calorieTracker.cyclingCalories(elapsedTime, location.speed),
+                elevationGain = 0f,
             )
         }
 
@@ -52,19 +62,14 @@ class ActivityTracker(weightKg: Float) {
     }
 
     fun reset() {
-        bikeMetrics = BikeMetrics(
-            speed = 0f,
-            distance = 0f,
-            totalTime = 0f,
-            rollingTime = 0f,
-            avgRollingSpeed = 0f,
-            calories = 0f,
-        )
+        bikeMetrics = getNewBikeMetrics()
         calorieTracker.reset()
     }
 
     companion object {
         private val MIN_MOVING_SPEED =
             UnitConversion.toMS(1.5f)
+        private val MAX_ALTITUDE_TIME =
+            UnitConversion.toMilliseconds(5f)
     }
 }

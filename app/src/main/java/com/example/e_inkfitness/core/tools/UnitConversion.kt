@@ -25,6 +25,14 @@ object UnitConversion {
         }
     }
 
+    fun toMilliseconds(timeSeconds:Float): Float{
+        return timeSeconds*1_000.0f
+    }
+
+    fun toSeconds(timeMillis:Float): Float{
+        return timeMillis/1000
+    }
+
     fun toMS(kmh: Float): Float {
         return (kmh * 0.277778).toFloat() // m/s
     }
