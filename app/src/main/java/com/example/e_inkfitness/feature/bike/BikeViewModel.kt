@@ -5,7 +5,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.example.e_inkfitness.core.model.BikeMetrics
 import com.example.e_inkfitness.core.model.Units
 import com.example.e_inkfitness.core.model.User
 import com.example.e_inkfitness.core.model.getNewBikeMetrics
@@ -29,11 +28,11 @@ class BikeViewModel : ViewModel() {
     )
         private set
 
-    fun onLocation(location: Location, altitude: AltitudeSample?, gpsState: GpsState) {
+    fun onLocation(location: Location, gpsState: GpsState) {
         if (uiState.activityState != ActivityState.ACTIVE) {
             return
         }
-        activityTracker.recordBikeActivity(location, altitude,gpsState)
+        activityTracker.recordBikeActivity(location, gpsState)
 
         uiState = uiState.copy(
             metrics = activityTracker.bikeMetrics,
@@ -48,6 +47,10 @@ class BikeViewModel : ViewModel() {
         if (uiState.gpsState == GpsState.DISABLED) {
             activityTracker.clearLastLocation()
         }
+    }
+
+    fun onAltitudeChange(altitudeSample: AltitudeSample) {
+        activityTracker.updateAltitude(altitudeSample)
     }
 
     fun onPauseClicked() {

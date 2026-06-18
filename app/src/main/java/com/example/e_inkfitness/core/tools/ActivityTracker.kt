@@ -1,6 +1,5 @@
 package com.example.e_inkfitness.core.tools
 
-import AltitudeTracker
 import android.location.Location
 import com.example.e_inkfitness.core.model.BikeMetrics
 import com.example.e_inkfitness.core.model.getNewBikeMetrics
@@ -23,15 +22,25 @@ class ActivityTracker(weightKg: Float) {
     private var lastLocation: Location? = null
     private val calorieTracker: CalorieTracker = CalorieTracker(weightKg)
     private val altitudeTracker: AltitudeTracker = AltitudeTracker()
+    private var lastAltitudeSample: AltitudeSample? = null
 
-    fun recordBikeActivity(location: Location, altitudeSample: AltitudeSample?, gptState: GpsState) {
+    fun recordBikeActivity(location: Location, gptState: GpsState) {
+
+        val altitudeSample = altitudeTracker.getAltitude()
         val prevLocation = lastLocation
         var elapsedTime = 0f
         if (prevLocation != null) {
             elapsedTime = (location.time - prevLocation.time) / 1000f
         }
-        if (altitudeSample != null){
-            altitudeTracker.updateAltitude(altitudeSample.altitudeMeters)
+
+        val lastAltitude = lastAltitudeSample
+        var altitudeDelta = 0f
+        if (altitudeSample != null && lastAltitude != null) {
+            altitudeDelta = altitudeSample.altitudeMeters - lastAltitude.altitudeMeters
+        }
+
+        if (altitudeSample != null) {
+            lastAltitudeSample = altitudeSample
         }
 
         // Only update the time
@@ -43,18 +52,24 @@ class ActivityTracker(weightKg: Float) {
         } else {
 
             val distance = prevLocation.distanceTo(location) + bikeMetrics.distance
+            val calories =
+                calorieTracker.cyclingCalories(elapsedTime, location.speed, altitudeDelta)
             bikeMetrics = BikeMetrics(
                 speed = location.speed,
                 distance = distance,
                 totalTime = elapsedTime + bikeMetrics.totalTime,
                 rollingTime = elapsedTime + bikeMetrics.rollingTime,
                 avgRollingSpeed = distance / (elapsedTime + bikeMetrics.rollingTime),
-                calories = calorieTracker.cyclingCalories(elapsedTime, location.speed),
-                elevationGain = 0f,
+                calories = calories,
+                elevationGain = bikeMetrics.elevationGain,
             )
         }
-
         lastLocation = location
+    }
+
+    fun updateAltitude(altitudeSample: AltitudeSample) {
+        altitudeTracker.updateAltitude(altitudeSample)
+        bikeMetrics = bikeMetrics.copy(elevationGain = altitudeTracker.getTotalAltitudeGain())
     }
 
     fun clearLastLocation() {

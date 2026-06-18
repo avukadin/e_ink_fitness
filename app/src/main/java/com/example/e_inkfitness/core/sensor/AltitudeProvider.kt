@@ -10,10 +10,11 @@ data class AltitudeSample(
     val altitudeMeters: Float
 )
 
+interface AltitudeCallback {
+    fun onAltitude(altitudeSample: AltitudeSample)
+}
 
-class AltitudeProvider : SensorEventListener {
-
-    var altitudeSample : AltitudeSample? = null
+class AltitudeProvider(private val callback: AltitudeCallback) : SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent) {
         if (event.sensor.type != Sensor.TYPE_PRESSURE) return
@@ -25,7 +26,7 @@ class AltitudeProvider : SensorEventListener {
             SensorManager.PRESSURE_STANDARD_ATMOSPHERE,
             pressureHPa
         )
-        altitudeSample = AltitudeSample(now, altitudeMeters)
+        callback.onAltitude(AltitudeSample(now, altitudeMeters))
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}

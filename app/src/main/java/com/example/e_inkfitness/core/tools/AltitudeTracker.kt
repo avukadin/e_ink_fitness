@@ -1,16 +1,21 @@
+package com.example.e_inkfitness.core.tools
+
+import com.example.e_inkfitness.core.sensor.AltitudeSample
 import kotlin.math.abs
 
 class AltitudeTracker {
 
     private var smoothedAltitude: Float? = null
-    private var lastAcceptedAltitude: Float? = null
+    private var lastAcceptedAltitude: AltitudeSample? = null
     private var totalAltitudeGain = 0f
 
-    fun updateAltitude(altitude: Float) {
+    fun updateAltitude(altitudeSample: AltitudeSample) {
+        val altitude = altitudeSample.altitudeMeters
+
         val previousSmooth = smoothedAltitude
         if (previousSmooth == null) {
-            smoothedAltitude = altitude
-            lastAcceptedAltitude = altitude
+            smoothedAltitude = altitudeSample.altitudeMeters
+            lastAcceptedAltitude = altitudeSample
             return
         }
 
@@ -18,22 +23,26 @@ class AltitudeTracker {
             previousSmooth + SMOOTHING_ALPHA * (altitude - previousSmooth)
 
         val last = lastAcceptedAltitude!!
-        val delta = smooth - last
+        val delta = smooth - last.altitudeMeters
         if (abs(delta) >= MIN_ACCEPTED_CHANGE) {
             if (delta > 0f) {
                 totalAltitudeGain += delta
             }
-            lastAcceptedAltitude = smooth
+            lastAcceptedAltitude = AltitudeSample(altitudeSample.timestampMs, smooth)
         }
         smoothedAltitude = smooth
     }
 
+
     fun getTotalAltitudeGain(): Float = totalAltitudeGain
 
-    fun getCurrentAltitude(): Float? = lastAcceptedAltitude
+    fun getAltitude(): AltitudeSample? {
+        return lastAcceptedAltitude
+    }
 
     companion object {
         private const val SMOOTHING_ALPHA = 0.15f
         private const val MIN_ACCEPTED_CHANGE = 0.5f
     }
+
 }

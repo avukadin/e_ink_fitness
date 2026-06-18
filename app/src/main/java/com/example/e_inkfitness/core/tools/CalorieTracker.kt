@@ -22,13 +22,13 @@ class CalorieTracker(private val weightKg: Float) {
         }
     }
 
-    fun cyclingCalories(timeSeconds: Float, speedMs: Float, elevationDelta:Float): Float {
+    fun cyclingCalories(timeSeconds: Float, speedMs: Float, elevationDelta: Float): Float {
         val speedKmh = UnitConversion.convertSpeed(
             speedMs,
             Units.METRIC
         )
 
-        if (elevationDelta!=0.0f){
+        if (elevationDelta != 0.0f) {
             calcElevationCalories(elevationDelta)
         }
 
@@ -46,23 +46,23 @@ class CalorieTracker(private val weightKg: Float) {
         return totalCalories
     }
 
-    private fun calcElevationCalories(elevationDelta:Float){
+    private fun calcElevationCalories(elevationDelta: Float) {
 
         var elevationCalories = 0f
-        if (elevationDelta>0){
+        if (elevationDelta > 0) {
             elevationCalories = calcUphillCalories(elevationDelta)
-        }else if (elevationDelta<0){
+        } else if (elevationDelta < 0) {
             elevationCalories = calcDownhillCalories(elevationDelta)
         }
         caloriesToOffset += elevationCalories
 
     }
 
-    private fun calcUphillCalories(elevationDelta:Float):Float{
+    private fun calcUphillCalories(elevationDelta: Float): Float {
         return weightKg * elevationDelta * UPHILL_KCAL_PER_KG_M
     }
 
-    private fun calcDownhillCalories(elevationDelta:Float):Float{
+    private fun calcDownhillCalories(elevationDelta: Float): Float {
         return weightKg * elevationDelta * DOWNHILL_KCAL_PER_KG_M
     }
 
@@ -73,5 +73,6 @@ class CalorieTracker(private val weightKg: Float) {
 
     companion object {
         private const val UPHILL_KCAL_PER_KG_M = 0.0095f
-        private const val DOWNHILL_KCAL_PER_KG_M = 0.0030f    }
+        private const val DOWNHILL_KCAL_PER_KG_M = 0.0030f
+    }
 }

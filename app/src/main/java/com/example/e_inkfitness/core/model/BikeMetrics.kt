@@ -11,7 +11,7 @@ data class BikeMetrics(
     val elevationGain: Float,
 )
 
-fun getNewBikeMetrics() : BikeMetrics{
+fun getNewBikeMetrics(): BikeMetrics {
     return BikeMetrics(
         speed = 0f,
         distance = 0f,

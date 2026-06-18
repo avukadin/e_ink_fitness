@@ -77,6 +77,16 @@ fun BikeScreen(
         Units.IMPERIAL -> "mi"
     }
 
+    val elevationGain = UnitConversion.convertElevation(
+        uiState.metrics.elevationGain,
+        uiState.user.units
+    )
+
+    val elevationUnit = when (uiState.user.units) {
+        Units.METRIC -> "m"
+        Units.IMPERIAL -> "ft"
+    }
+
     val elapsedTime = formatElapsedTime(uiState.metrics.totalTime)
     val snackbarHostState = remember { SnackbarHostStateMMD() }
 
@@ -186,10 +196,22 @@ fun BikeScreen(
                     modifier = Modifier.weight(1f)
                 ) {
                     MetricBox(
+                        value = String.format(Locale.US, "%.0f", elevationGain),
+                        sub1 = "elevation gain ($elevationUnit)",
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    VerticalDividerMMD(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .padding(vertical = 8.dp)
+                    )
+
+                    MetricBox(
                         value = elapsedTime,
-                        sub1 = "Time",
+                        sub1 = "time",
                         modifier = Modifier.weight(1f),
-                        valueFontSize = 52.sp
+                        valueFontSize = 42.sp
                     )
                 }
 

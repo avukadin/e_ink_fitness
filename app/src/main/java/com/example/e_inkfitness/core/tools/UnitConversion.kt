@@ -25,12 +25,19 @@ object UnitConversion {
         }
     }
 
-    fun toMilliseconds(timeSeconds:Float): Float{
-        return timeSeconds*1_000.0f
+    fun convertElevation(elevationMeters: Float, units: Units): Float {
+        return when (units) {
+            Units.METRIC -> elevationMeters
+            Units.IMPERIAL -> elevationMeters * 3.28084f // feet
+        }
     }
 
-    fun toSeconds(timeMillis:Float): Float{
-        return timeMillis/1000
+    fun toMilliseconds(timeSeconds: Float): Float {
+        return timeSeconds * 1_000.0f
+    }
+
+    fun toSeconds(timeMillis: Float): Float {
+        return timeMillis / 1000
     }
 
     fun toMS(kmh: Float): Float {
