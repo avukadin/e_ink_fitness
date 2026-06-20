@@ -73,6 +73,6 @@ class CalorieTracker(private val weightKg: Float) {
 
     companion object {
         private const val UPHILL_KCAL_PER_KG_M = 0.0095f
-        private const val DOWNHILL_KCAL_PER_KG_M = 0.0030f
+        private const val DOWNHILL_KCAL_PER_KG_M = 0.00234f
     }
 }
