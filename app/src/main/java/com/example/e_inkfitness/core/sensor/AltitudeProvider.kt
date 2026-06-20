@@ -1,5 +1,6 @@
 package com.example.e_inkfitness.core.sensor
 
+import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -14,7 +15,23 @@ interface AltitudeCallback {
     fun onAltitude(altitudeSample: AltitudeSample)
 }
 
-class AltitudeProvider(private val callback: AltitudeCallback) : SensorEventListener {
+class AltitudeProvider(
+    context: Context,
+    private val callback: AltitudeCallback
+) : SensorEventListener {
+
+    private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    private val pressureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
+
+    fun start() {
+        pressureSensor?.let {
+            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
+        }
+    }
+
+    fun stop() {
+        sensorManager.unregisterListener(this)
+    }
 
     override fun onSensorChanged(event: SensorEvent) {
         if (event.sensor.type != Sensor.TYPE_PRESSURE) return

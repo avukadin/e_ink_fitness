@@ -36,8 +36,12 @@ class AltitudeTracker {
 
     fun getTotalAltitudeGain(): Float = totalAltitudeGain
 
-    fun getAltitude(): AltitudeSample? {
-        return lastAcceptedAltitude
+    fun getAltitude(): AltitudeSample? = lastAcceptedAltitude
+
+    fun reset() {
+        smoothedAltitude = null
+        lastAcceptedAltitude = null
+        totalAltitudeGain = 0f
     }
 
     companion object {

@@ -79,12 +79,11 @@ class ActivityTracker(weightKg: Float) {
     fun reset() {
         bikeMetrics = getNewBikeMetrics()
         calorieTracker.reset()
+        altitudeTracker.reset()
+        lastAltitudeSample = null
     }
 
     companion object {
-        private val MIN_MOVING_SPEED =
-            UnitConversion.toMS(1.5f)
-        private val MAX_ALTITUDE_TIME =
-            UnitConversion.toMilliseconds(5f)
+        private val MIN_MOVING_SPEED = UnitConversion.toMS(1.5f)
     }
 }

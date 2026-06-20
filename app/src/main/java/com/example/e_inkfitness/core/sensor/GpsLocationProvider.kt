@@ -73,6 +73,7 @@ class GpsLocationProvider(
     override fun onLocationChanged(location: Location) {
         if (location.hasAccuracy() && location.accuracy >= MAX_ACCURACY) {
             gpsState = GpsState.LOW_ACCURACY
+            goodFixCount = 0
         } else {
             goodFixCount += 1
         }

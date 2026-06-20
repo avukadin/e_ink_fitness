@@ -16,6 +16,7 @@ import com.example.e_inkfitness.core.sensor.AltitudeSample
 import com.example.e_inkfitness.core.sensor.GpsLocationProvider
 import com.example.e_inkfitness.core.sensor.GpsState
 import com.example.e_inkfitness.core.sensor.LocationCallback
+import com.example.e_inkfitness.feature.bike.ActivityState
 import com.example.e_inkfitness.feature.bike.BikeScreen
 import com.example.e_inkfitness.feature.bike.BikeViewModel
 import com.example.e_inkfitness.feature.bike.ButtonClickCallbacks
@@ -44,7 +45,7 @@ class MainActivity : ComponentActivity() {
             WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
         )
 
-        altitudeProvider = AltitudeProvider(object : AltitudeCallback {
+        altitudeProvider = AltitudeProvider(this, object : AltitudeCallback {
             override fun onAltitude(altitudeSample: AltitudeSample) {
                 bikeViewModel.onAltitudeChange(altitudeSample)
             }
@@ -72,6 +73,10 @@ class MainActivity : ComponentActivity() {
                         override fun onStop() {
                             onStopClicked()
                         }
+
+                        override fun onSettings() {
+                            // settings screen not yet implemented
+                        }
                     }
                 )
             }
@@ -92,6 +97,7 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         locationProvider.stop()
+        altitudeProvider.stop()
     }
 
     override fun onResume() {
@@ -103,13 +109,21 @@ class MainActivity : ComponentActivity() {
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
 
-        if (hasPermission) {
-            bikeViewModel.onGpsStateChange(GpsState.STOPPED)
+        // Only restart GPS if the ride is active; paused/stopped rides stay stopped
+        if (hasPermission && bikeViewModel.uiState.activityState == ActivityState.ACTIVE) {
             locationProvider.start()
-        } else {
+            bikeViewModel.onGpsStateChange(locationProvider.gpsState)
+        } else if (!hasPermission) {
             bikeViewModel.onGpsStateChange(GpsState.DENIED)
             locationProvider.stop()
         }
+
+        altitudeProvider.start()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        altitudeProvider.stop()
     }
 
     fun onPauseClicked() {
@@ -127,10 +141,11 @@ class MainActivity : ComponentActivity() {
         locationProvider.stop()
     }
 
+    // Auto-pause when the app is sent to the background during an active ride
     override fun onStop() {
-        bikeViewModel.onPauseClicked()
+        if (bikeViewModel.uiState.activityState == ActivityState.ACTIVE) {
+            onPauseClicked()
+        }
         super.onStop()
     }
 }
-
-

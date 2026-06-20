@@ -43,6 +43,7 @@ interface ButtonClickCallbacks {
     fun onPause()
     fun onStop()
     fun onResume()
+    fun onSettings()
 }
 
 
@@ -211,7 +212,7 @@ fun BikeScreen(
                         value = elapsedTime,
                         sub1 = "time",
                         modifier = Modifier.weight(1f),
-                        valueFontSize = 42.sp
+                        valueFontSize = 35.sp
                     )
                 }
 
@@ -330,7 +331,7 @@ private fun Controls(
             }
 
             IconButton(
-                onClick = { buttonClickCallbacks.onStop() },
+                onClick = { buttonClickCallbacks.onSettings() },
                 modifier = Modifier
                     .size(iconSize)
                     .fillMaxSize(),
