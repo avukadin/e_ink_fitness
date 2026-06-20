@@ -65,9 +65,7 @@ class GpsLocationProvider(
             )
         } catch (e: SecurityException) {
             gpsState = GpsState.DENIED
-            return
         }
-        gpsState = GpsState.ACTIVE
     }
 
     override fun onLocationChanged(location: Location) {
@@ -75,6 +73,7 @@ class GpsLocationProvider(
             gpsState = GpsState.LOW_ACCURACY
             goodFixCount = 0
         } else {
+            gpsState = GpsState.ACTIVE
             goodFixCount += 1
         }
 
