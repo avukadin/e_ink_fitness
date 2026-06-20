@@ -50,7 +50,9 @@ class BikeViewModel : ViewModel() {
     }
 
     fun onAltitudeChange(altitudeSample: AltitudeSample) {
-        activityTracker.updateAltitude(altitudeSample)
+        if (uiState.activityState == ActivityState.ACTIVE) {
+            activityTracker.updateAltitude(altitudeSample)
+        }
     }
 
     fun onPauseClicked() {
@@ -61,6 +63,7 @@ class BikeViewModel : ViewModel() {
         )
         onGpsStateChange(GpsState.STOPPED)
         activityTracker.clearLastLocation()
+        activityTracker.resetAltitudeBaseline()
     }
 
     fun onStopClicked() {

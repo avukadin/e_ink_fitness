@@ -81,6 +81,11 @@ class ActivityTracker(weightKg: Float) {
         lastLocation = null
     }
 
+    fun resetAltitudeBaseline() {
+        altitudeTracker.resetBaseline()
+        lastAltitudeSample = null
+    }
+
     fun reset() {
         bikeMetrics = getNewBikeMetrics()
         calorieTracker.reset()

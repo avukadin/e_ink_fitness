@@ -38,6 +38,11 @@ class AltitudeTracker {
 
     fun getAltitude(): AltitudeSample? = lastAcceptedAltitude
 
+    fun resetBaseline() {
+        smoothedAltitude = null
+        lastAcceptedAltitude = null
+    }
+
     fun reset() {
         smoothedAltitude = null
         lastAcceptedAltitude = null
@@ -45,8 +50,8 @@ class AltitudeTracker {
     }
 
     companion object {
-        private const val SMOOTHING_ALPHA = 0.15f
-        private const val MIN_ACCEPTED_CHANGE = 0.5f
+        private const val SMOOTHING_ALPHA = 0.08f
+        private const val MIN_ACCEPTED_CHANGE = 1.0f
     }
 
 }
