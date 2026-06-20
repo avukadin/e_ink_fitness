@@ -141,10 +141,11 @@ class MainActivity : ComponentActivity() {
         locationProvider.stop()
     }
 
-    // Auto-pause when the app is sent to the background during an active ride
     override fun onStop() {
+        // Stop GPS but keep lastLocation and activity state intact so the gap can be estimated
+        // on the next location update when the app regains focus
         if (bikeViewModel.uiState.activityState == ActivityState.ACTIVE) {
-            onPauseClicked()
+            locationProvider.stop()
         }
         super.onStop()
     }

@@ -52,8 +52,13 @@ class ActivityTracker(weightKg: Float) {
         } else {
 
             val distance = prevLocation.distanceTo(location) + bikeMetrics.distance
+            val effectiveSpeedMs = if (elapsedTime > GAP_THRESHOLD) {
+                prevLocation.distanceTo(location) / elapsedTime
+            } else {
+                location.speed
+            }
             val calories =
-                calorieTracker.cyclingCalories(elapsedTime, location.speed, altitudeDelta)
+                calorieTracker.cyclingCalories(elapsedTime, effectiveSpeedMs, altitudeDelta)
             bikeMetrics = BikeMetrics(
                 speed = location.speed,
                 distance = distance,
@@ -85,5 +90,6 @@ class ActivityTracker(weightKg: Float) {
 
     companion object {
         private val MIN_MOVING_SPEED = UnitConversion.toMS(1.5f)
+        private const val GAP_THRESHOLD = 10f // seconds
     }
 }
