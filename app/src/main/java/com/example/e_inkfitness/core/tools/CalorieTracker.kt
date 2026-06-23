@@ -32,7 +32,8 @@ class CalorieTracker(private val weightKg: Float) {
             calcElevationCalories(elevationDelta)
         }
 
-        var burnedSince = cyclingMet(speedKmh) * weightKg * (timeSeconds / (60 * 60f))
+        // 1 MET is subtracted to remove resting calories burned
+        var burnedSince = (cyclingMet(speedKmh) - 1f) * weightKg * (timeSeconds / (60 * 60f))
         var elevationOffset = 0f
         if (caloriesToOffset > 0) {
             elevationOffset = min(burnedSince * 0.5f, caloriesToOffset)
